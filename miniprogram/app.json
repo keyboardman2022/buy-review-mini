@@ -1,0 +1,37 @@
+{
+  "pages": [
+    "pages/login/index",
+    "pages/feed/index",
+    "pages/cart/index",
+    "pages/approvals/index",
+    "pages/profile/index",
+    "pages/compose/index",
+    "pages/item-detail/index",
+    "pages/approval-create/index",
+    "pages/approval-detail/index",
+    "pages/friends/index",
+    "pages/messages/index"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#0f4c4c",
+    "navigationBarTextStyle": "white",
+    "navigationBarTitleText": "买前问问",
+    "backgroundColor": "#f7f1e6",
+    "backgroundTextStyle": "dark",
+    "enablePullDownRefresh": false
+  },
+  "tabBar": {
+    "color": "#6f756f",
+    "selectedColor": "#0f5c56",
+    "backgroundColor": "#fffdf8",
+    "borderStyle": "white",
+    "list": [
+      { "pagePath": "pages/feed/index", "text": "购物圈" },
+      { "pagePath": "pages/cart/index", "text": "购物车" },
+      { "pagePath": "pages/approvals/index", "text": "审批" },
+      { "pagePath": "pages/profile/index", "text": "我的" }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

@@ -1,0 +1,1 @@
+.message { min-height: 150rpx; }.message-body { margin: 22rpx 0; font-size: 31rpx; line-height: 1.6; }

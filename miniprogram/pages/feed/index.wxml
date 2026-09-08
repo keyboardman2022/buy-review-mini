@@ -1,0 +1,11 @@
+<view class="page">
+  <view class="hero compact"><view class="eyebrow">FRIENDS ONLY</view><view class="hero-title">朋友们最近在看</view><view class="hero-copy">认真提问，坦率表达。购物动态只对当前好友可见。</view></view>
+  <view wx:if="{{error}}" class="error">{{error}} <text class="retry" bindtap="load">重试</text></view>
+  <view wx:if="{{loading}}" class="loading">正在整理好友动态…</view>
+  <view wx:elif="{{!items.length}}" class="empty"><text class="empty-mark">动态</text>还没有好友动态<view class="small">去“我的”添加好友，或先创建自己的购物清单</view></view>
+  <view wx:for="{{items}}" wx:key="id" class="card">
+    <view class="row"><view class="avatar" style="background:{{item.owner.color}}">{{item.owner.initial}}</view><view class="grow"><view class="title">{{item.owner.name}}</view><view class="muted small">{{item.timeText}}</view></view><text class="tag">{{item.category || '想买'}}</text></view>
+    <view class="item-main" data-id="{{item.id}}" bindtap="openItem"><view class="row between item-head"><view class="title grow">{{item.title}}</view><view class="price">{{item.priceText}}</view></view><view class="meta">{{item.reason}}</view><view wx:if="{{item.photos.length}}" class="media-grid"><image wx:for="{{item.photos}}" wx:for-item="photo" wx:key="*this" class="media" src="{{photo}}" mode="aspectFill" /></view></view>
+    <view class="actions"><button size="mini" class="btn-ghost" data-id="{{item.id}}" data-value="1" disabled="{{item.reacting}}" bindtap="react">{{item.myReaction === 1 ? '已赞' : '赞'}} {{item.likes}}</button><button size="mini" class="btn-ghost" data-id="{{item.id}}" data-value="-1" disabled="{{item.reacting}}" bindtap="react">{{item.myReaction === -1 ? '已踩' : '踩'}} {{item.dislikes}}</button><button size="mini" class="btn-ghost" data-id="{{item.id}}" bindtap="openItem">聊聊 {{item.commentCount}}</button></view>
+  </view>
+</view>

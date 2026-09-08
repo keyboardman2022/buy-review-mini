@@ -1,0 +1,6 @@
+<view class="page">
+  <view class="notice">当前通道：{{smsProvider}}<text wx:if="{{mode === 'demo'}}"> · 本地演示不会产生短信费用</text></view>
+  <view wx:if="{{error}}" class="error" role="alert">{{error}}</view><view wx:if="{{loading}}" class="loading">正在读取消息记录…</view>
+  <view wx:elif="{{!messages.length}}" class="empty"><text class="empty-mark">短信</text>审批发出后，提醒记录会显示在这里</view>
+  <view wx:for="{{messages}}" wx:key="id" class="card message" data-id="{{item.approvalId}}" bindtap="openApproval"><view class="row between"><text class="tag {{item.kind === 'result' ? 'coral' : ''}}">{{item.kind === 'review' ? '审批提醒' : '结果通知'}}</text><text class="status {{item.status}}">{{item.statusText}}</text></view><view class="message-body">{{item.body}}</view><view class="row between muted small"><text>{{item.direction === 'received' ? '发给我' : '发给 ' + item.recipientName}}</text><text>{{item.timeText}}</text></view></view>
+</view>

@@ -1,0 +1,8 @@
+<view class="page">
+  <view class="hero compact"><view class="eyebrow">DECIDE TOGETHER</view><view class="hero-title">把犹豫交给朋友</view><view class="hero-copy">每一票都要留下理由，结果按你选择的规则自动计算。</view></view>
+  <view class="segmented"><view class="segment {{scope === 'inbox' ? 'active' : ''}}" data-scope="inbox" bindtap="switchScope">待我审批</view><view class="segment {{scope === 'sent' ? 'active' : ''}}" data-scope="sent" bindtap="switchScope">我发起的</view></view>
+  <view wx:if="{{error}}" class="error">{{error}}</view><view wx:if="{{loading}}" class="loading">正在更新审批…</view>
+  <view wx:elif="{{!approvals.length}}" class="empty"><text class="empty-mark">审批</text>{{scope === 'inbox' ? '暂时没有需要你决定的事' : '还没有发起过审批'}}<button wx:if="{{scope === 'sent'}}" class="btn-primary btn-wide" bindtap="createApproval">发起第一次审批</button></view>
+  <view wx:for="{{approvals}}" wx:key="id" class="card approval-card" data-id="{{item.id}}" bindtap="openApproval"><view class="row between"><view class="row grow"><view class="avatar" style="background:{{item.owner.color}}">{{item.owner.initial}}</view><view class="grow"><view class="small muted">{{scope === 'inbox' ? item.owner.name + ' 请你看看' : '发起于 ' + item.createdText}}</view><view class="title approval-title">{{item.title}}</view></view></view><text class="status {{item.status}}">{{item.statusText}}</text></view><view class="row between summary"><text class="muted">{{item.reviewers.length}} 位好友 · {{item.rule}}</text><text class="price">{{item.priceText}}</text></view></view>
+  <button class="fab" bindtap="createApproval">发起审批</button>
+</view>

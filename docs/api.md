@@ -2,7 +2,7 @@
 
 Base URL http://127.0.0.1:3210。除登录和health外：Authorization: Bearer <token>。JSON成功返回直接对象（不套data），错误 {error:中文消息} 和4xx/5xx。时间均epoch毫秒。金额price整数分，输入API也是price分。列表默认最近100条。
 
-User={id,name,code,phoneMasked,color}。token存在wx本地存储仅用于会话凭证。SMS验证码不进入日志。
+User={id,name,initial,code,phoneMasked,color}。token存在wx本地存储仅用于会话凭证。SMS验证码不进入日志。
 
 - GET /api/health -> {ok:true,mode:'demo'|'production',smsProvider:'mock'|'tencent'}
 - POST /api/auth/code {phone} -> {challengeId,expiresIn:300,retryAfter:60,demoCode?}

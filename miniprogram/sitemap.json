@@ -1,0 +1,4 @@
+{
+  "desc": "本地演示小程序",
+  "rules": [{ "action": "allow", "page": "*" }]
+}

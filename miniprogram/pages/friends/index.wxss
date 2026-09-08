@@ -1,0 +1,1 @@
+.add-card { margin-top: 16rpx; }.invite-input { flex: 1; }.add-button { flex-shrink: 0; margin-left: 14rpx; }.friend-row { align-items: center; }.request-actions { display: flex; gap: 12rpx; margin-top: 20rpx; }.friend-row .btn-danger { flex-shrink: 0; }

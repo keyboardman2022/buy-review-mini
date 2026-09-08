@@ -1,0 +1,11 @@
+.compact { padding: 34rpx; }
+.compact .hero-title { font-size: 39rpx; }
+.form-card { margin-top: 28rpx; padding: 30rpx; border-radius: 28rpx; background: #fffdf8; }
+.two,.visibility { display: grid; grid-template-columns: 1fr 1fr; gap: 14rpx; }
+.visibility-card { box-sizing: border-box; min-height: 112rpx; padding: 22rpx; border: 2rpx solid #d8d6cd; border-radius: 18rpx; }
+.visibility-card text,.visibility-card label { display: block; }
+.visibility-card label { margin-top: 6rpx; color: #5f6964; font-size: 24rpx; }
+.visibility-card.selected { border-color: #0f5c56; background: #e9f3ef; }
+.preview-wrap { position: relative; }
+.remove { position: absolute; right: -8rpx; top: -8rpx; min-width: 88rpx; min-height: 64rpx; padding: 0 14rpx; border-radius: 32rpx; color: white; background: #d95f45; text-align: center; line-height: 64rpx; }
+.image-add { display: flex; align-items: center; justify-content: center; width: 190rpx; height: 190rpx; border: 2rpx dashed #c9c5bc; border-radius: 18rpx; color: #5f6964; text-align: center; white-space: pre-line; }

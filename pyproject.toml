@@ -1,0 +1,19 @@
+[project]
+name = "buy-before-api"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi==0.116.1",
+  "uvicorn[standard]==0.35.0",
+  "psycopg[binary]==3.2.9",
+  "httpx==0.28.1",
+  "python-dotenv==1.0.1",
+]
+
+[project.optional-dependencies]
+test = ["pytest==8.4.1"]
+
+[tool.pytest.ini_options]
+testpaths = ["backend/tests"]
+addopts = "-q"
+markers = ["integration: requires TEST_DATABASE_URL pointing at an isolated PostgreSQL database"]
