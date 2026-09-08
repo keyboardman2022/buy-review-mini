@@ -15,7 +15,7 @@ function loadScript(relativePath, extras = {}) {
     module: { exports: {} },
     exports: {},
     require(specifier) {
-      if (specifier.startsWith('/')) return extras.modules?.[specifier];
+      if (extras.modules && Object.hasOwn(extras.modules, specifier)) return extras.modules[specifier];
       throw new Error(`Unexpected require: ${specifier}`);
     },
     ...extras.globals,
@@ -27,7 +27,7 @@ function loadScript(relativePath, extras = {}) {
 function loadPage(relativePath, { api = {}, wx = {} } = {}) {
   let definition;
   const { sandbox } = loadScript(relativePath, {
-    modules: { '/utils/api': api, '/utils/format': api },
+    modules: { '../../utils/api': api, '../../utils/format': api },
     globals: {
       Page(value) { definition = value; },
       getApp() { return { ensureSession: async () => true }; },

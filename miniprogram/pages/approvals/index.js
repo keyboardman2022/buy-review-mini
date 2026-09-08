@@ -1,5 +1,5 @@
-const { request } = require('/utils/api');
-const { money, dateTime } = require('/utils/format');
+const { request } = require('../../utils/api');
+const { money, dateTime } = require('../../utils/format');
 const statusText = { pending: '待审批', approved: '已通过', rejected: '已拒绝', expired: '已过期', cancelled: '已撤回' };
 Page({
   data: { scope: 'inbox', approvals: [], loading: true, error: '' },

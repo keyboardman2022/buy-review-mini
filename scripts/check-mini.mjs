@@ -42,10 +42,22 @@ function walk(directory) {
   }
 }
 walk(path.join(root, 'miniprogram'));
-for (const filename of [path.join(root, 'app.js'), path.join(root, 'utils', 'api.js'), path.join(root, 'utils', 'format.js')]) scripts.push(filename);
+scripts.push(path.join(root, 'app.js'));
 for (const filename of scripts) {
   const result = spawnSync(process.execPath, ['--check', filename], { encoding: 'utf8' });
   if (result.status !== 0) errors.push(`${path.relative(root, filename)}: ${result.stderr.trim()}`);
+  const source = fs.readFileSync(filename, 'utf8');
+  for (const match of source.matchAll(/require\(['"]([^'"]+)['"]\)/g)) {
+    const specifier = match[1];
+    if (specifier.startsWith('/')) {
+      errors.push(`${path.relative(root, filename)}: absolute require is not supported by WeChat: ${specifier}`);
+      continue;
+    }
+    if (specifier.startsWith('.')) {
+      const target = path.resolve(path.dirname(filename), specifier);
+      if (!fs.existsSync(target) && !fs.existsSync(`${target}.js`)) errors.push(`${path.relative(root, filename)}: missing required module ${specifier}`);
+    }
+  }
 }
 if (errors.length) {
   console.error(errors.join('\n'));

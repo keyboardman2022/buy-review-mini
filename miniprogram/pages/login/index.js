@@ -1,4 +1,4 @@
-const { request, token } = require('/utils/api');
+const { request, token } = require('../../utils/api');
 
 Page({
   data: { phone: '', name: '', code: '', challengeId: '', demoCode: '', countdown: 0, submitting: false, sending: false, error: '', invite: '', approvalId: '' },

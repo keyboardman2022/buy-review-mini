@@ -1,5 +1,5 @@
-const { request } = require('/utils/api');
-const { money } = require('/utils/format');
+const { request } = require('../../utils/api');
+const { money } = require('../../utils/format');
 Page({
   data: { items: [], friends: [], itemId: '', selectedIds: [], rule: 'veto', loading: true, submitting: false, error: '' },
   onLoad(options) { this.setData({ itemId: options.itemId || '' }); if (getApp().ensureSession()) this.load(); },

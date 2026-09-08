@@ -1,5 +1,5 @@
-const { request, absoluteMediaUrl } = require('/utils/api');
-const { money, dateTime } = require('/utils/format');
+const { request, absoluteMediaUrl } = require('../../utils/api');
+const { money, dateTime } = require('../../utils/format');
 
 const ruleText = { veto: '一票否决', majority: '多数决定', unanimous: '全员一致' };
 const statusText = { pending: '待审批', approved: '已通过', rejected: '已拒绝', expired: '已过期', cancelled: '已撤回' };

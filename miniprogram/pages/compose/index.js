@@ -1,5 +1,5 @@
-const { request, uploadImage, absoluteMediaUrl } = require('/utils/api');
-const { yuanToCents } = require('/utils/format');
+const { request, uploadImage, absoluteMediaUrl } = require('../../utils/api');
+const { yuanToCents } = require('../../utils/format');
 Page({
   data: { id: '', title: '', price: '', reason: '', category: '', link: '', visibility: 'friends', images: [], previews: [], uploading: false, submitting: false, loading: false, error: '' },
   onLoad(options) { if (!getApp().ensureSession()) return; if (options.id) { this.setData({ id: options.id }); this.loadItem(); } },

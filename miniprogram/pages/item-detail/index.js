@@ -1,5 +1,5 @@
-const { request, absoluteMediaUrl } = require('/utils/api');
-const { decorateItem, dateTime } = require('/utils/format');
+const { request, absoluteMediaUrl } = require('../../utils/api');
+const { decorateItem, dateTime } = require('../../utils/format');
 Page({
   data: { id: '', item: null, comments: [], comment: '', loading: true, submitting: false, reacting: false, error: '', isOwner: false },
   onLoad(options) { this.setData({ id: options.id || '' }); if (getApp().ensureSession()) this.load(); },

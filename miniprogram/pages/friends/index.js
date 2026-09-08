@@ -1,4 +1,4 @@
-const { request } = require('/utils/api');
+const { request } = require('../../utils/api');
 
 Page({
   data: { invite: '', friends: [], incoming: [], outgoing: [], loading: true, submitting: false, error: '' },

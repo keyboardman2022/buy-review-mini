@@ -1,4 +1,4 @@
-const { request, clearSession } = require('/utils/api');
+const { request, clearSession } = require('../../utils/api');
 Page({
   data: { user: null, stats: {}, mode: '', smsProvider: '', editing: false, name: '', loading: true, switching: false, error: '' },
   onShow() { if (getApp().ensureSession()) this.load(); },

@@ -1,4 +1,4 @@
-const { token, clearSession } = require('/utils/api');
+const { token, clearSession } = require('./miniprogram/utils/api');
 
 App({
   globalData: { user: null, launchTarget: null },

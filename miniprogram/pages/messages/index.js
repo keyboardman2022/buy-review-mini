@@ -1,5 +1,5 @@
-const { request } = require('/utils/api');
-const { dateTime } = require('/utils/format');
+const { request } = require('../../utils/api');
+const { dateTime } = require('../../utils/format');
 
 const statusText = { queued: '等待发送', sending: '正在发送', mock: '本地模拟', sent: '已送达供应商', failed: '发送失败', unknown: '结果待核对' };
 Page({

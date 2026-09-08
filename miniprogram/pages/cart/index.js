@@ -1,5 +1,5 @@
-const { request, absoluteMediaUrl } = require('/utils/api');
-const { decorateItem } = require('/utils/format');
+const { request, absoluteMediaUrl } = require('../../utils/api');
+const { decorateItem } = require('../../utils/format');
 Page({
   data: { items: [], loading: true, error: '', deletingId: '' },
   onShow() { if (getApp().ensureSession()) this.load(); },
