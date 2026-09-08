@@ -14,6 +14,7 @@ from psycopg.types.json import Jsonb
 
 from .db import Database
 from .domain import DomainError, RULES, ensure, evaluate, parse_phone, parse_product, required_text
+from .wechat import exchange_login_code, exchange_phone_code
 
 
 COLORS = ("#176B5B", "#D05F47", "#536D9B")
@@ -25,12 +26,13 @@ def now_ms() -> int:
 
 
 class Service:
-    def __init__(self, db: Database, *, secret: str, data_dir: Path, mode: str, sms, clock=now_ms):
+    def __init__(self, db: Database, *, secret: str, data_dir: Path, mode: str, sms, wechat: dict | None = None, clock=now_ms):
         self.db = db
         self.secret = secret.encode()
         self.data_dir = data_dir
         self.mode = mode
         self.sms = sms
+        self.wechat = wechat or {}
         self.clock = clock
         self.upload_dir = data_dir / "uploads"
         self.upload_dir.mkdir(parents=True, exist_ok=True)
@@ -50,19 +52,19 @@ class Service:
         if not row:
             return None
         phone = row["phone"]
-        masked = "虚构演示账号" if phone.startswith("demo:") else f"{phone[:3]}****{phone[-4:]}"
-        return {"id": row["id"], "name": row["name"], "initial": row["name"][:1], "code": row["code"], "phoneMasked": masked, "color": row["color"]}
+        masked = "虚构演示账号" if phone and phone.startswith("demo:") else f"{phone[:3]}****{phone[-4:]}" if phone else "微信登录"
+        return {"id": row["id"], "name": row["name"], "initial": row["name"][:1], "code": row["code"], "phoneMasked": masked, "hasPhone": bool(phone), "color": row["color"]}
 
     def _lookup_user(self, conn, user_id: str) -> dict | None:
         return conn.execute("SELECT * FROM users WHERE id=%s", (user_id,)).fetchone()
 
-    def _create_user(self, conn, phone: str, name: str, user_id: str | None = None) -> dict:
+    def _create_user(self, conn, phone: str | None, name: str, user_id: str | None = None, *, wechat_openid: str | None = None) -> dict:
         user_id = user_id or self._id()
         for _ in range(5):
             code = secrets.token_hex(5).upper()
             row = conn.execute(
-                "INSERT INTO users(id,phone,name,code,color,created_at) VALUES(%s,%s,%s,%s,%s,%s) ON CONFLICT DO NOTHING RETURNING *",
-                (user_id, phone, name, code, secrets.choice(COLORS), self.clock()),
+                "INSERT INTO users(id,phone,wechat_openid,name,code,color,created_at) VALUES(%s,%s,%s,%s,%s,%s,%s) ON CONFLICT DO NOTHING RETURNING *",
+                (user_id, phone, wechat_openid, name, code, secrets.choice(COLORS), self.clock()),
             ).fetchone()
             if row:
                 return row
@@ -110,6 +112,18 @@ class Service:
         if self.mode == "demo" and self.sms.mode == "mock":
             result["demoCode"] = code
         return result
+
+    def wechat_login(self, code_value: object) -> dict:
+        if self.mode == "demo" and not self.wechat.get("app_secret"):
+            required_text(code_value, "微信登录凭证", 256)
+            return self.demo_login("a")
+        openid = exchange_login_code(self.wechat, code_value)
+        with self.db.transaction() as conn:
+            conn.execute("SELECT pg_advisory_xact_lock(hashtext(%s))", (f"wechat:{openid}",))
+            row = conn.execute("SELECT * FROM users WHERE wechat_openid=%s", (openid,)).fetchone()
+            if not row:
+                row = self._create_user(conn, None, f"微信用户{openid[-4:]}", wechat_openid=openid)
+            return self._new_session(conn, row)
 
     def login(self, payload: dict) -> dict:
         phone = parse_phone(payload.get("phone"))
@@ -169,6 +183,11 @@ class Service:
 
     def rename(self, user_id: str, value: object) -> dict:
         self.db.execute("UPDATE users SET name=%s WHERE id=%s", (required_text(value, "昵称", 24), user_id))
+        return {"user": self._user(self.db.fetchone("SELECT * FROM users WHERE id=%s", (user_id,)))}
+
+    def bind_wechat_phone(self, user_id: str, code_value: object) -> dict:
+        phone = parse_phone(exchange_phone_code(self.wechat, code_value))
+        self.db.execute("UPDATE users SET phone=%s WHERE id=%s", (phone, user_id))
         return {"user": self._user(self.db.fetchone("SELECT * FROM users WHERE id=%s", (user_id,)))}
 
     @staticmethod
@@ -513,6 +532,10 @@ class Service:
                 if not row:
                     break
                 conn.execute("UPDATE outbox SET status='sending' WHERE id=%s", (row["id"],))
+            if not row["phone"]:
+                self.db.execute("UPDATE outbox SET status='failed',error='接收人尚未授权短信手机号' WHERE id=%s", (row["id"],))
+                delivered += 1
+                continue
             try:
                 response = self.sms.send(row["kind"], row["phone"], list(row["params"]), row["body"])
                 self.db.execute("UPDATE outbox SET status=%s,provider_id=%s,error=NULL WHERE id=%s", (response["status"], response.get("providerId"), row["id"]))

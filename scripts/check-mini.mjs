@@ -26,7 +26,7 @@ for (const page of app.pages || []) {
   if (fs.existsSync(base + '.wxml') && fs.existsSync(base + '.js')) {
     const markup = fs.readFileSync(base + '.wxml', 'utf8');
     const script = fs.readFileSync(base + '.js', 'utf8');
-    const handlers = [...markup.matchAll(/(?:bind|catch)(?:tap|input|change|submit|longpress)="([A-Za-z_$][\w$]*)"/g)].map((match) => match[1]);
+    const handlers = [...markup.matchAll(/(?:bind|catch)(?:tap|input|change|submit|longpress|getphonenumber)="([A-Za-z_$][\w$]*)"/g)].map((match) => match[1]);
     for (const handler of new Set(handlers)) {
       const signature = new RegExp(`(?:async\\s+)?${handler}\\s*\\(`);
       if (!signature.test(script)) errors.push(`${page}: missing event handler ${handler}`);

@@ -13,21 +13,21 @@
     "miniprogram/pages/messages/index"
   ],
   "window": {
-    "navigationBarBackgroundColor": "#0f5c56",
-    "navigationBarTextStyle": "white",
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTextStyle": "black",
     "navigationBarTitleText": "买前问问",
-    "backgroundColor": "#f7f2e9",
+    "backgroundColor": "#f5f6f8",
     "backgroundTextStyle": "dark",
     "enablePullDownRefresh": false
   },
   "tabBar": {
     "color": "#6f756f",
-    "selectedColor": "#0f5c56",
-    "backgroundColor": "#fffdf8",
+    "selectedColor": "#ff6436",
+    "backgroundColor": "#ffffff",
     "borderStyle": "white",
     "list": [
       { "pagePath": "miniprogram/pages/feed/index", "text": "购物圈" },
-      { "pagePath": "miniprogram/pages/cart/index", "text": "购物车" },
+      { "pagePath": "miniprogram/pages/cart/index", "text": "想买" },
       { "pagePath": "miniprogram/pages/approvals/index", "text": "审批" },
       { "pagePath": "miniprogram/pages/profile/index", "text": "我的" }
     ]

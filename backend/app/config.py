@@ -16,6 +16,7 @@ class Settings:
     public_url: str | None
     host: str
     port: int
+    wechat: dict
     sms: dict
 
     @classmethod
@@ -35,6 +36,7 @@ class Settings:
             public_url=os.getenv("PUBLIC_URL") or None,
             host=os.getenv("HOST", "127.0.0.1"),
             port=int(os.getenv("PORT", "3210")),
+            wechat={"app_id": os.getenv("WECHAT_APP_ID", ""), "app_secret": os.getenv("WECHAT_APP_SECRET", "")},
             sms={
                 "mode": mode, "provider": os.getenv("SMS_PROVIDER", "mock"),
                 "secret_id": os.getenv("TENCENT_SECRET_ID", ""), "secret_key": os.getenv("TENCENT_SECRET_KEY", ""),

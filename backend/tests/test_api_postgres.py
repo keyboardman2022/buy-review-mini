@@ -23,7 +23,7 @@ def client(tmp_path):
     db.execute("TRUNCATE outbox,votes,approvals,reactions,comments,items,media,friends,friend_requests,sessions,challenges,users CASCADE")
     settings = Settings(
         mode="demo", database_url=DATABASE_URL, auth_secret="integration-test-secret", data_dir=tmp_path,
-        public_url="http://testserver", host="127.0.0.1", port=3210,
+        public_url="http://testserver", host="127.0.0.1", port=3210, wechat={"app_id": "", "app_secret": ""},
         sms={"mode": "demo", "provider": "mock", "secret_id": "", "secret_key": "", "sms_app_id": "", "sign_name": "", "templates": {"otp": "", "review": "", "result": ""}, "region": "ap-guangzhou"},
     )
     with TestClient(create_app(settings)) as value:

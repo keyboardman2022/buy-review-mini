@@ -1,10 +1,9 @@
 <view class="page">
-  <view class="row between top-line"><view><view class="eyebrow teal">MY SHORTLIST</view><view class="page-title">我的购物车</view></view><button class="btn-coral" bindtap="createItem">添加商品</button></view>
-  <view wx:if="{{error}}" class="error">{{error}}</view><view wx:if="{{loading}}" class="loading">正在读取购物车…</view>
-  <view wx:elif="{{!items.length}}" class="empty"><text class="empty-mark">购物车</text>购物车还是空的<view class="small">记录一件想买的东西，再听听朋友怎么说</view><button class="btn-primary btn-wide" bindtap="createItem">添加第一件商品</button></view>
-  <view wx:for="{{items}}" wx:key="id" class="card">
-    <view data-id="{{item.id}}" bindtap="openItem"><view class="row between"><text class="tag {{item.visibility === 'private' ? 'gray' : ''}}">{{item.visibility === 'private' ? '仅自己' : '好友可见'}}</text><text class="muted small">{{item.timeText}}</text></view><view class="row between product-title"><view class="title grow">{{item.title}}</view><view class="price">{{item.priceText}}</view></view><view class="meta">{{item.reason}}</view><image wx:if="{{item.photos[0]}}" class="cover" src="{{item.photos[0]}}" mode="aspectFill" /></view>
-    <view class="actions"><button size="mini" class="btn-ghost" data-id="{{item.id}}" bindtap="editItem">编辑</button><button size="mini" class="btn-ghost" data-id="{{item.id}}" bindtap="openItem">评论 {{item.commentCount}}</button><button size="mini" class="btn-danger" data-id="{{item.id}}" loading="{{deletingId === item.id}}" disabled="{{deletingId}}" bindtap="deleteItem">删除</button></view>
+  <view class="page-header"><view><view class="page-kicker">MY WISH LIST</view><view class="page-title">想买清单</view><view class="page-subtitle">先记下来，再决定要不要买</view></view><button class="round-add" bindtap="createItem">添加</button></view>
+  <view wx:if="{{error}}" class="error">{{error}}</view><view wx:if="{{loading}}" class="loading">正在读取清单…</view>
+  <view wx:elif="{{!items.length}}" class="empty"><text class="empty-mark">清单还是空的</text><view>把正在犹豫的东西放进来。</view><button class="btn-primary btn-wide" bindtap="createItem">添加第一件商品</button></view>
+  <view wx:for="{{items}}" wx:key="id" class="wish-card">
+    <view data-id="{{item.id}}" bindtap="openItem"><view class="row between"><text class="tag {{item.visibility === 'private' ? '' : 'green'}}">{{item.visibility === 'private' ? '仅自己' : '好友可见'}}</text><text class="muted small">{{item.timeText}}</text></view><view class="wish-main"><view class="grow"><view class="wish-title">{{item.title}}</view><view class="meta clamp">{{item.reason}}</view><view class="price wish-price">{{item.priceText}}</view></view><image wx:if="{{item.photos[0]}}" class="cover" src="{{item.photos[0]}}" mode="aspectFill"/></view></view>
+    <view class="wish-actions"><button data-id="{{item.id}}" bindtap="editItem">编辑</button><button data-id="{{item.id}}" bindtap="openItem">{{item.commentCount}} 条评论</button><button class="danger" data-id="{{item.id}}" loading="{{deletingId === item.id}}" disabled="{{deletingId}}" bindtap="deleteItem">移除</button></view>
   </view>
-  <button wx:if="{{items.length}}" class="fab" bindtap="createItem">添加想买</button>
 </view>

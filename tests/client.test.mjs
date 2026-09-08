@@ -24,13 +24,13 @@ function loadScript(relativePath, extras = {}) {
   return { exports: sandbox.module.exports, sandbox };
 }
 
-function loadPage(relativePath, { api = {}, wx = {} } = {}) {
+function loadPage(relativePath, { api = {}, wx = {}, app = { ensureSession: async () => true, globalData: {}, openLaunchTarget() {} } } = {}) {
   let definition;
   const { sandbox } = loadScript(relativePath, {
     modules: { '../../utils/api': api, '../../utils/format': api },
     globals: {
       Page(value) { definition = value; },
-      getApp() { return { ensureSession: async () => true }; },
+      getApp() { return app; },
       wx: {
         showToast() {},
         navigateBack() {},
@@ -51,6 +51,27 @@ test('compose converts a two-decimal yuan price to integer cents', () => {
   assert.equal(exports.yuanToCents('0.01'), 1);
   assert.equal(exports.yuanToCents('12.345'), null);
   assert.equal(exports.yuanToCents(''), null);
+});
+
+test('login uses wx.login and never asks for phone registration', async () => {
+  const calls = [];
+  const app = { globalData: {}, openLaunchTarget() {} };
+  const { page } = loadPage('miniprogram/pages/login/index.js', {
+    app,
+    api: { request: async (path, options) => { calls.push({ path, data: options.data }); return { token: 'session-token', user: { id: 'wx-user' } }; }, token: () => '' },
+    wx: {
+      login({ success }) { success({ code: 'wx-temporary-code' }); },
+      setStorageSync() {},
+      switchTab() {},
+    },
+  });
+  await page.wechatLogin();
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].path, '/api/auth/wechat');
+  assert.equal(calls[0].data.code, 'wx-temporary-code');
+  const markup = fs.readFileSync(path.join(root, 'miniprogram/pages/login/index.wxml'), 'utf8');
+  assert.equal(markup.includes('手机号'), false);
+  assert.equal(markup.includes('验证码'), false);
 });
 
 test('vote refuses blank mandatory comment without issuing an API call', async () => {

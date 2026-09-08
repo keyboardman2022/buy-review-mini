@@ -2,15 +2,16 @@
 
 Base URL http://127.0.0.1:3210。除登录和health外：Authorization: Bearer <token>。JSON成功返回直接对象（不套data），错误 {error:中文消息} 和4xx/5xx。时间均epoch毫秒。金额price整数分，输入API也是price分。列表默认最近100条。
 
-User={id,name,initial,code,phoneMasked,color}。token存在wx本地存储仅用于会话凭证。SMS验证码不进入日志。
+User={id,name,initial,code,phoneMasked,hasPhone,color}。token存在wx本地存储，仅用于应用自己的会话凭证；微信 session_key 不返回客户端。
 
 - GET /api/health -> {ok:true,mode:'demo'|'production',smsProvider:'mock'|'tencent'}
-- POST /api/auth/code {phone} -> {challengeId,expiresIn:300,retryAfter:60,demoCode?}
-- POST /api/auth/login {phone,challengeId,code,name?} -> {token,user}
+- POST /api/auth/wechat {code} -> {token,user}；小程序端由 wx.login 获取 code，生产环境后端调用 code2Session，本地演示映射到固定虚构身份
+- POST /api/auth/code 与 POST /api/auth/login 为迁移兼容接口，新小程序界面不再使用手机号注册登录
 - POST /api/auth/demo {account:'a'|'b'|'c'} -> {token,user}；仅demo可用，幂等播种虚构账号及样例商品与好友
 - POST /api/auth/logout {} -> {ok:true}
 - GET /api/me -> {user,stats:{cartCount,pendingCount,friendCount},mode,smsProvider}
 - PATCH /api/me {name} -> {user}
+- POST /api/me/phone {code} -> {user}；code 来自用户主动点击 `open-type="getPhoneNumber"`，用于可选短信通知绑定
 - GET /api/friends -> {friends:User[],incoming:[{id,user,createdAt}],outgoing:[{id,user,createdAt}]}
 - POST /api/friends/request {code} -> {ok:true}
 - POST /api/friends/:id/respond {accept:boolean} -> {ok:true}

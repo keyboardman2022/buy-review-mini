@@ -4,7 +4,7 @@
 
 ## 已有功能
 
-- 手机验证码注册和登录；演示环境在页面显示验证码，不发真实短信。
+- 打开即通过微信登录，无注册表单；生产环境由后端使用 code2Session 换取微信用户标识。
 - 邀请码添加好友、处理申请和解除好友。
 - 个人购物车：商品、价格、购买理由、分类、链接、可见范围和最多三张图片。
 - 好友购物圈：评论、点赞、下踩和取消反应。
@@ -33,17 +33,16 @@ python -m uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 3210
 1. 导入 `D:\Codex\buy-review-mini`。根目录直接包含 `app.json` 和 `project.config.json`，不要选择上一级 `D:\Codex` 或里面的 `miniprogram` 文件夹。
 2. 没有真实 AppID 时使用游客/测试方式。
 3. 本地开发在「详情 → 本地设置」勾选不校验合法域名、TLS 和 HTTPS 证书。
-4. 编译后可用小满、阿禾、可可三个虚构账号体验；三人初始互为好友，各有一件样例商品。
-5. 新账号可获取并填写页面显示的演示验证码。
+4. 开发模式没有微信 AppSecret 时，`wx.login` 会自动进入“小满”虚构身份，数据库会同时准备好友和样例商品。
 
 真机无法通过手机自身的 `127.0.0.1` 连接电脑。真机联调需 HTTPS 测试域名，把 [api.js](D:/Codex/buy-review-mini/miniprogram/utils/api.js) 中的 `BASE_URL` 改为该地址，并在微信公众平台配置服务器域名。
 
 ## 推荐演示流程
 
-1. 以小满登录，在购物车添加商品。
-2. 发起审批，选择阿禾和可可，采用多数决定。
-3. 切换为阿禾提交接受意见，再切换可可提交拒绝意见。
-4. 两人平票时结果为未通过；切回小满可查看意见和模拟短信记录。
+1. 打开小程序后自动以微信身份登录，在想买清单添加商品。
+2. 发起审批，选择好友和决定规则。
+3. 使用另一个已加入体验名单的微信账号处理审批并留下意见。
+4. 回到发起账号查看结果和通知记录。
 5. 在购物圈评论、点赞或下踩好友商品。
 
 | 规则 | 判定 |
@@ -56,7 +55,7 @@ python -m uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 3210
 
 ## 短信与验证
 
-开发环境保留 `APP_MODE=demo` 和 `SMS_PROVIDER=mock`。真实短信配置见 [短信说明](D:/Codex/buy-review-mini/docs/sms.md)，密钥只能存于后端环境变量。真实上线还需小程序账号、类目、备案 HTTPS 域名、隐私说明及短信签名/模板资质。
+开发环境保留 `APP_MODE=demo` 和 `SMS_PROVIDER=mock`。生产环境还需配置 `WECHAT_APP_ID`、`WECHAT_APP_SECRET`；AppSecret 只能保存在后端。真实短信配置见 [短信说明](D:/Codex/buy-review-mini/docs/sms.md)。真实上线还需小程序账号、类目、备案 HTTPS 域名、隐私说明及短信签名/模板资质。
 
 ```powershell
 python -m pytest backend/tests

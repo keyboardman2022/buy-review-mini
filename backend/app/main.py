@@ -17,7 +17,7 @@ from .sms import create_sms_provider
 def create_app(settings: Settings | None = None, *, clock=None, initialize: bool = True) -> FastAPI:
     settings = settings or Settings.from_env()
     db = Database(settings.database_url)
-    service_options = {"secret": settings.auth_secret, "data_dir": settings.data_dir, "mode": settings.mode, "sms": create_sms_provider(settings.sms)}
+    service_options = {"secret": settings.auth_secret, "data_dir": settings.data_dir, "mode": settings.mode, "sms": create_sms_provider(settings.sms), "wechat": settings.wechat}
     if clock is not None:
         service_options["clock"] = clock
     service = Service(db, **service_options)
@@ -74,6 +74,10 @@ def create_app(settings: Settings | None = None, *, clock=None, initialize: bool
     def request_code(request: Request, payload: dict = Body(...)):
         return service.request_code(payload.get("phone"), request.client.host if request.client else "unknown")
 
+    @app.post("/api/auth/wechat")
+    def wechat_login(payload: dict = Body(...)):
+        return service.wechat_login(payload.get("code"))
+
     @app.post("/api/auth/login")
     def login(payload: dict = Body(...)):
         return service.login(payload)
@@ -93,6 +97,10 @@ def create_app(settings: Settings | None = None, *, clock=None, initialize: bool
     @app.patch("/api/me")
     def rename(payload: dict = Body(...), user: dict = Depends(current_user)):
         return service.rename(user["id"], payload.get("name"))
+
+    @app.post("/api/me/phone")
+    def bind_phone(payload: dict = Body(...), user: dict = Depends(current_user)):
+        return service.bind_wechat_phone(user["id"], payload.get("code"))
 
     @app.get("/api/friends")
     def friends(user: dict = Depends(current_user)):
