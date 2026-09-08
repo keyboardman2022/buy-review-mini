@@ -1,0 +1,7 @@
+node_modules/
+.env
+data/
+*.log
+project.private.config.json
+.superpowers/
+artifacts/
