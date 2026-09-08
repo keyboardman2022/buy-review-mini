@@ -45,6 +45,19 @@ function loadPage(relativePath, { api = {}, wx = {}, app = { ensureSession: asyn
   return { page: definition, sandbox };
 }
 
+function loadApp({ api = {}, wx = {} } = {}) {
+  let definition;
+  const { sandbox } = loadScript('app.js', {
+    modules: { './miniprogram/utils/api': api },
+    globals: {
+      App(value) { definition = value; },
+      wx,
+    },
+  });
+  assert.ok(definition, 'app.js must register App(...)');
+  return { app: definition, sandbox };
+}
+
 test('compose converts a two-decimal yuan price to integer cents', () => {
   const { exports } = loadScript('miniprogram/utils/format.js');
   assert.equal(exports.yuanToCents('12.34'), 1234);
@@ -138,4 +151,46 @@ test('duplicate vote taps share one in-flight request', async () => {
   release();
   await Promise.all([first, second]);
   assert.equal(page.data.submitting, false);
+});
+
+test('approval share card opens the approval detail page directly', () => {
+  const { page } = loadPage('miniprogram/pages/approval-detail/index.js');
+  page.data = { id: 'approval / 1', approval: { title: '降噪耳机' } };
+  const share = page.onShareAppMessage();
+  assert.equal(share.title, '请帮我看看：降噪耳机');
+  assert.equal(share.path, '/miniprogram/pages/approval-detail/index?id=approval%20%2F%201');
+});
+
+test('approval deep link resumes after automatic WeChat login', () => {
+  let destination = '';
+  const { app } = loadApp({
+    api: { token: () => '', clearSession() {} },
+    wx: { reLaunch({ url }) { destination = url; } },
+  });
+  const authenticated = app.ensureSession({ approvalId: 'approval-1' });
+  assert.equal(authenticated, false);
+  assert.deepEqual(app.globalData.launchTarget, { approvalId: 'approval-1' });
+  assert.equal(destination, '/miniprogram/pages/login/index');
+});
+
+test('approval deep link restores the current user before enabling voting', async () => {
+  const app = { ensureSession: () => true, globalData: {}, openLaunchTarget() {} };
+  const approval = {
+    id: 'approval-1', ownerId: 'owner-1', owner: { id: 'owner-1' }, title: '降噪耳机',
+    price: 89900, createdAt: 1, expiresAt: 2, status: 'pending', rule: 'majority', imageUrls: [],
+    reviewers: [{ id: 'reviewer-1', user: { id: 'reviewer-1' }, decision: null, comment: null, votedAt: null }],
+  };
+  const { page } = loadPage('miniprogram/pages/approval-detail/index.js', {
+    app,
+    api: {
+      request: async (path) => path === '/api/me' ? { user: { id: 'reviewer-1' } } : { approval },
+      absoluteMediaUrl: (value) => value,
+      money: () => '¥899.00',
+      dateTime: () => '刚刚',
+    },
+  });
+  page.data.id = 'approval-1';
+  await page.load();
+  assert.equal(app.globalData.user.id, 'reviewer-1');
+  assert.equal(page.data.canVote, true);
 });

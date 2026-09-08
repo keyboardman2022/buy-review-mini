@@ -7,8 +7,9 @@ App({
     if (query.invite) this.globalData.launchTarget = { invite: query.invite };
     if (query.approvalId) this.globalData.launchTarget = { approvalId: query.approvalId };
   },
-  ensureSession() {
+  ensureSession(launchTarget) {
     if (token()) return true;
+    if (launchTarget) this.globalData.launchTarget = launchTarget;
     clearSession();
     wx.reLaunch({ url: '/miniprogram/pages/login/index' });
     return false;

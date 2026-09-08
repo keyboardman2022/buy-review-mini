@@ -7,13 +7,23 @@ const decisionText = { accept: '接受购买', reject: '拒绝购买' };
 
 Page({
   data: { id: '', approval: null, comment: '', loading: true, submitting: false, error: '', isOwner: false, canVote: false },
-  onLoad(options) { this.setData({ id: options.id || '' }); if (getApp().ensureSession()) this.load(); },
+  onLoad(options) {
+    const id = options.id || '';
+    this.setData({ id });
+    if (!id) { this.setData({ loading: false, error: '审批链接无效' }); return; }
+    if (getApp().ensureSession({ approvalId: id })) this.load();
+  },
   onPullDownRefresh() { this.load().finally(() => wx.stopPullDownRefresh()); },
   async load() {
     this.setData({ loading: true, error: '' });
     try {
-      const { approval } = await request(`/api/approvals/${this.data.id}`);
-      const user = getApp().globalData.user;
+      const app = getApp();
+      let user = app.globalData.user;
+      const [{ approval }, profile] = await Promise.all([
+        request(`/api/approvals/${this.data.id}`),
+        user ? Promise.resolve(null) : request('/api/me'),
+      ]);
+      if (profile) { user = profile.user; app.globalData.user = user; }
       const mine = user && approval.reviewers.find((entry) => entry.user.id === user.id);
       this.setData({
         approval: {
@@ -29,7 +39,10 @@ Page({
         isOwner: Boolean(user && user.id === approval.ownerId),
         canVote: Boolean(mine && !mine.decision && approval.status === 'pending'),
       });
-    } catch (error) { this.setData({ error: error.message }); }
+    } catch (error) {
+      if (error.statusCode === 401) { getApp().ensureSession({ approvalId: this.data.id }); return; }
+      this.setData({ error: error.message });
+    }
     finally { this.setData({ loading: false }); }
   },
   inputComment(event) { this.setData({ comment: event.detail.value, error: '' }); },
@@ -56,5 +69,5 @@ Page({
       finally { this.setData({ submitting: false }); }
     } });
   },
-  onShareAppMessage() { return { title: `请帮我看看：${this.data.approval ? this.data.approval.title : '购买审批'}`, path: `/miniprogram/pages/login/index?approvalId=${encodeURIComponent(this.data.id)}` }; },
+  onShareAppMessage() { return { title: `请帮我看看：${this.data.approval ? this.data.approval.title : '购买审批'}`, path: `/miniprogram/pages/approval-detail/index?id=${encodeURIComponent(this.data.id)}` }; },
 });
