@@ -7,5 +7,5 @@ Page({
   onShow() { if (getApp().ensureSession()) this.load(); },
   onPullDownRefresh() { this.load().finally(() => wx.stopPullDownRefresh()); },
   async load() { this.setData({ loading: true, error: '' }); try { const data = await request('/api/messages'); this.setData({ ...data, messages: data.messages.map((entry) => ({ ...entry, timeText: dateTime(entry.createdAt), statusText: statusText[entry.status] || entry.status })) }); } catch (error) { this.setData({ error: error.message }); } finally { this.setData({ loading: false }); } },
-  openApproval(event) { wx.navigateTo({ url: `/pages/approval-detail/index?id=${event.currentTarget.dataset.id}` }); },
+  openApproval(event) { wx.navigateTo({ url: `/miniprogram/pages/approval-detail/index?id=${event.currentTarget.dataset.id}` }); },
 });

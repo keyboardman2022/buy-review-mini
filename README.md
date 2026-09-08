@@ -30,7 +30,7 @@ python -m uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 3210
 
 ## 导入微信开发者工具
 
-1. 导入 `D:\Codex\buy-review-mini`；`project.config.json` 已将代码目录指向 `miniprogram/`。
+1. 导入 `D:\Codex\buy-review-mini`。根目录直接包含 `app.json` 和 `project.config.json`，不要选择上一级 `D:\Codex` 或里面的 `miniprogram` 文件夹。
 2. 没有真实 AppID 时使用游客/测试方式。
 3. 本地开发在「详情 → 本地设置」勾选不校验合法域名、TLS 和 HTTPS 证书。
 4. 编译后可用小满、阿禾、可可三个虚构账号体验；三人初始互为好友，各有一件样例商品。

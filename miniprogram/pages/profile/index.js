@@ -16,8 +16,8 @@ Page({
     try { const { user } = await request('/api/me', { method: 'PATCH', data: { name: this.data.name.trim() } }); this.setData({ user, editing: false }); }
     catch (error) { this.setData({ error: error.message }); }
   },
-  openFriends() { wx.navigateTo({ url: '/pages/friends/index' }); },
-  openMessages() { wx.navigateTo({ url: '/pages/messages/index' }); },
+  openFriends() { wx.navigateTo({ url: '/miniprogram/pages/friends/index' }); },
+  openMessages() { wx.navigateTo({ url: '/miniprogram/pages/messages/index' }); },
   async switchDemo(event) {
     if (this.data.switching) return;
     this.setData({ switching: true, error: '' });
@@ -26,7 +26,7 @@ Page({
     finally { this.setData({ switching: false }); }
   },
   logout() {
-    wx.showModal({ title: '退出登录？', content: '本机只会清除会话凭证。', success: async ({ confirm }) => { if (!confirm) return; try { await request('/api/auth/logout', { method: 'POST' }); } catch (_) {} clearSession(); wx.reLaunch({ url: '/pages/login/index' }); } });
+    wx.showModal({ title: '退出登录？', content: '本机只会清除会话凭证。', success: async ({ confirm }) => { if (!confirm) return; try { await request('/api/auth/logout', { method: 'POST' }); } catch (_) {} clearSession(); wx.reLaunch({ url: '/miniprogram/pages/login/index' }); } });
   },
-  onShareAppMessage() { return { title: `${this.data.user.name} 邀请你加入买前问问`, path: `/pages/login/index?invite=${encodeURIComponent(this.data.user.code)}` }; },
+  onShareAppMessage() { return { title: `${this.data.user.name} 邀请你加入买前问问`, path: `/miniprogram/pages/login/index?invite=${encodeURIComponent(this.data.user.code)}` }; },
 });

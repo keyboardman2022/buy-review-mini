@@ -12,6 +12,6 @@ Page({
     catch (error) { this.setData({ error: error.message }); }
     finally { this.setData({ loading: false }); }
   },
-  openApproval(event) { wx.navigateTo({ url: `/pages/approval-detail/index?id=${event.currentTarget.dataset.id}` }); },
-  createApproval() { wx.navigateTo({ url: '/pages/approval-create/index' }); },
+  openApproval(event) { wx.navigateTo({ url: `/miniprogram/pages/approval-detail/index?id=${event.currentTarget.dataset.id}` }); },
+  createApproval() { wx.navigateTo({ url: '/miniprogram/pages/approval-create/index' }); },
 });

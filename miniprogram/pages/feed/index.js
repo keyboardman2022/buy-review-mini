@@ -12,7 +12,7 @@ Page({
     } catch (error) { this.setData({ error: error.message }); }
     finally { this.setData({ loading: false }); }
   },
-  openItem(event) { wx.navigateTo({ url: `/pages/item-detail/index?id=${event.currentTarget.dataset.id}` }); },
+  openItem(event) { wx.navigateTo({ url: `/miniprogram/pages/item-detail/index?id=${event.currentTarget.dataset.id}` }); },
   async react(event) {
     const { id, value } = event.currentTarget.dataset;
     const item = this.data.items.find((entry) => entry.id === id);

@@ -3,12 +3,21 @@
   "compileType": "miniprogram",
   "libVersion": "3.7.12",
   "projectname": "buy-review-mini",
-  "miniprogramRoot": "miniprogram/",
   "setting": {
     "urlCheck": false,
     "es6": true,
     "enhance": true,
     "postcss": true,
     "minified": true
+  },
+  "packOptions": {
+    "ignore": [
+      { "type": "folder", "value": "backend" },
+      { "type": "folder", "value": "data" },
+      { "type": "folder", "value": "design-system" },
+      { "type": "folder", "value": "docs" },
+      { "type": "folder", "value": "scripts" },
+      { "type": "folder", "value": "tests" }
+    ]
   }
 }

@@ -1,0 +1,37 @@
+{
+  "pages": [
+    "miniprogram/pages/login/index",
+    "miniprogram/pages/feed/index",
+    "miniprogram/pages/cart/index",
+    "miniprogram/pages/approvals/index",
+    "miniprogram/pages/profile/index",
+    "miniprogram/pages/compose/index",
+    "miniprogram/pages/item-detail/index",
+    "miniprogram/pages/approval-create/index",
+    "miniprogram/pages/approval-detail/index",
+    "miniprogram/pages/friends/index",
+    "miniprogram/pages/messages/index"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#0f5c56",
+    "navigationBarTextStyle": "white",
+    "navigationBarTitleText": "买前问问",
+    "backgroundColor": "#f7f2e9",
+    "backgroundTextStyle": "dark",
+    "enablePullDownRefresh": false
+  },
+  "tabBar": {
+    "color": "#6f756f",
+    "selectedColor": "#0f5c56",
+    "backgroundColor": "#fffdf8",
+    "borderStyle": "white",
+    "list": [
+      { "pagePath": "miniprogram/pages/feed/index", "text": "购物圈" },
+      { "pagePath": "miniprogram/pages/cart/index", "text": "购物车" },
+      { "pagePath": "miniprogram/pages/approvals/index", "text": "审批" },
+      { "pagePath": "miniprogram/pages/profile/index", "text": "我的" }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

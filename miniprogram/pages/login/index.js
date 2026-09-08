@@ -6,7 +6,7 @@ Page({
     if (options.invite) getApp().globalData.launchTarget = { invite: options.invite };
     if (options.approvalId) getApp().globalData.launchTarget = { approvalId: options.approvalId };
     this.setData({ invite: options.invite || '', approvalId: options.approvalId || '' });
-    if (token()) wx.switchTab({ url: '/pages/feed/index', success: () => setTimeout(() => getApp().openLaunchTarget(), 120) });
+    if (token()) wx.switchTab({ url: '/miniprogram/pages/feed/index', success: () => setTimeout(() => getApp().openLaunchTarget(), 120) });
   },
   onUnload() { if (this.timer) clearInterval(this.timer); },
   inputPhone(event) { this.setData({ phone: event.detail.value, error: '' }); },
@@ -49,6 +49,6 @@ Page({
   finishLogin(result) {
     wx.setStorageSync('token', result.token);
     getApp().globalData.user = result.user;
-    wx.switchTab({ url: '/pages/feed/index', success: () => setTimeout(() => getApp().openLaunchTarget(), 120) });
+    wx.switchTab({ url: '/miniprogram/pages/feed/index', success: () => setTimeout(() => getApp().openLaunchTarget(), 120) });
   },
 });

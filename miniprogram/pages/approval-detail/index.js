@@ -56,5 +56,5 @@ Page({
       finally { this.setData({ submitting: false }); }
     } });
   },
-  onShareAppMessage() { return { title: `请帮我看看：${this.data.approval ? this.data.approval.title : '购买审批'}`, path: `/pages/login/index?approvalId=${encodeURIComponent(this.data.id)}` }; },
+  onShareAppMessage() { return { title: `请帮我看看：${this.data.approval ? this.data.approval.title : '购买审批'}`, path: `/miniprogram/pages/login/index?approvalId=${encodeURIComponent(this.data.id)}` }; },
 });

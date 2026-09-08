@@ -10,9 +10,9 @@ Page({
     catch (error) { this.setData({ error: error.message }); }
     finally { this.setData({ loading: false }); }
   },
-  createItem() { wx.navigateTo({ url: '/pages/compose/index' }); },
-  openItem(event) { wx.navigateTo({ url: `/pages/item-detail/index?id=${event.currentTarget.dataset.id}` }); },
-  editItem(event) { wx.navigateTo({ url: `/pages/compose/index?id=${event.currentTarget.dataset.id}` }); },
+  createItem() { wx.navigateTo({ url: '/miniprogram/pages/compose/index' }); },
+  openItem(event) { wx.navigateTo({ url: `/miniprogram/pages/item-detail/index?id=${event.currentTarget.dataset.id}` }); },
+  editItem(event) { wx.navigateTo({ url: `/miniprogram/pages/compose/index?id=${event.currentTarget.dataset.id}` }); },
   deleteItem(event) {
     const id = event.currentTarget.dataset.id;
     if (this.data.deletingId) return;
