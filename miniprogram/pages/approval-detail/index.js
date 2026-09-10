@@ -1,12 +1,9 @@
 const { request, absoluteMediaUrl } = require('../../utils/api');
-const { money, dateTime } = require('../../utils/format');
-
-const ruleText = { veto: '一票否决', majority: '多数决定', unanimous: '全员一致' };
-const statusText = { pending: '待审批', approved: '已通过', rejected: '已拒绝', expired: '已过期', cancelled: '已撤回' };
-const decisionText = { accept: '接受购买', reject: '拒绝购买' };
+const { decorateApproval } = require('../../utils/approval');
+const { createShareCard } = require('../../utils/share-card');
 
 Page({
-  data: { id: '', approval: null, comment: '', loading: true, submitting: false, error: '', isOwner: false, canVote: false },
+  data: { id: '', approval: null, comment: '', loading: true, submitting: false, error: '', isOwner: false, canVote: false, shareImage: '' },
   onLoad(options) {
     const id = options.id || '';
     this.setData({ id });
@@ -15,6 +12,7 @@ Page({
   },
   onPullDownRefresh() { this.load().finally(() => wx.stopPullDownRefresh()); },
   async load() {
+    if (!this.data.id) { this.setData({ loading: false, error: '审批链接无效' }); return; }
     this.setData({ loading: true, error: '' });
     try {
       const app = getApp();
@@ -26,19 +24,11 @@ Page({
       if (profile) { user = profile.user; app.globalData.user = user; }
       const mine = user && approval.reviewers.find((entry) => entry.user.id === user.id);
       this.setData({
-        approval: {
-          ...approval,
-          priceText: money(approval.price),
-          createdText: dateTime(approval.createdAt),
-          expiresText: dateTime(approval.expiresAt),
-          statusText: statusText[approval.status] || approval.status,
-          ruleText: ruleText[approval.rule] || approval.rule,
-          photos: (approval.imageUrls || []).map(absoluteMediaUrl),
-          reviewers: approval.reviewers.map((entry) => ({ ...entry, decisionText: entry.decision ? decisionText[entry.decision] : '等待意见', votedText: entry.votedAt ? dateTime(entry.votedAt) : '' })),
-        },
+        approval: decorateApproval(approval, absoluteMediaUrl),
         isOwner: Boolean(user && user.id === approval.ownerId),
         canVote: Boolean(mine && !mine.decision && approval.status === 'pending'),
       });
+      this.prepareShareCard();
     } catch (error) {
       if (error.statusCode === 401) { getApp().ensureSession({ approvalId: this.data.id }); return; }
       this.setData({ error: error.message });
@@ -46,6 +36,16 @@ Page({
     finally { this.setData({ loading: false }); }
   },
   inputComment(event) { this.setData({ comment: event.detail.value, error: '' }); },
+  previewPhotos(event) { const urls = this.data.approval.photos; wx.previewImage({ urls, current: urls[Number(event.currentTarget.dataset.index)] }); },
+  focusVote() { wx.pageScrollTo({ selector: '#vote-form', duration: 200 }); },
+  prepareShareCard() {
+    const version = this.shareVersion = (this.shareVersion || 0) + 1;
+    this.setData({ shareImage: '' });
+    createShareCard(this, this.data.approval).then((shareImage) => {
+      if (version === this.shareVersion) this.setData({ shareImage });
+    }).catch(() => {});
+  },
+  onUnload() { this.shareVersion = (this.shareVersion || 0) + 1; },
   async submitVote(event) {
     if (this.data.submitting) return;
     const comment = (this.data.comment || '').trim();
@@ -69,5 +69,10 @@ Page({
       finally { this.setData({ submitting: false }); }
     } });
   },
-  onShareAppMessage() { return { title: `请帮我看看：${this.data.approval ? this.data.approval.title : '购买审批'}`, path: `/miniprogram/pages/approval-detail/index?id=${encodeURIComponent(this.data.id)}` }; },
+  onShareAppMessage() {
+    const approval = this.data.approval;
+    return { title: approval ? `帮我拿个主意：${approval.title} ${approval.priceText || ''}`.trim() : '帮我拿个主意',
+      path: `/miniprogram/pages/approval-detail/index?id=${encodeURIComponent(this.data.id)}`,
+      imageUrl: this.data.shareImage || '/miniprogram/assets/share-fallback.png' };
+  },
 });

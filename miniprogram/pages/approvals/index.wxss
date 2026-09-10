@@ -1,1 +1,8 @@
 .segmented { margin-bottom: 28rpx; }.round-add { min-width: 112rpx; min-height: 72rpx; padding: 0 24rpx; border-radius: 36rpx; color: #fff; background: #17181a; line-height: 72rpx; }.round-add.accent { background: #ff6436; }.approval-card { margin-bottom: 20rpx; padding: 28rpx; border-radius: 26rpx; background: #fff; border: 1rpx solid #eceef1; }.approval-title { margin-top: 30rpx; font-size: 36rpx; font-weight: 800; }.approval-bottom { margin-top: 24rpx; }.approval-bottom .tag { margin-right: 14rpx; }
+
+
+.approval-product { display:flex; gap:24rpx; margin-top:26rpx; align-items:center; }
+.approval-title { margin:0 0 12rpx; font-size:33rpx; line-height:1.4; }
+.approval-cover { width:128rpx; height:128rpx; border-radius:18rpx; flex-shrink:0; background:#f1efe7; }
+.deadline { font-size:23rpx; color:#73786d; }.deadline.urgent { color:#b74e2b; }
+.approval-bottom { gap:12rpx; flex-wrap:wrap; }

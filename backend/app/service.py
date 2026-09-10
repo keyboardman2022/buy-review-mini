@@ -433,14 +433,19 @@ class Service:
                                "decision": v["decision"], "comment": v["comment"], "votedAt": v["voted_at"]} for v in votes]}
 
     def list_approvals(self, user_id: str, scope: str, base_url: str) -> dict:
-        ensure(scope in {"sent", "inbox"}, "审批列表范围不正确")
+        ensure(scope in {"sent", "inbox", "pending", "handled"}, "审批列表范围不正确")
         self.expire_pending()
         with self.db.connect() as conn:
             if scope == "sent":
                 rows = conn.execute("SELECT * FROM approvals WHERE owner_id=%s ORDER BY created_at DESC LIMIT 100", (user_id,)).fetchall()
+            elif scope == "pending":
+                rows = conn.execute("SELECT a.* FROM approvals a JOIN votes v ON v.approval_id=a.id WHERE v.user_id=%s AND v.decision IS NULL AND a.status='pending' ORDER BY a.expires_at,a.id LIMIT 100", (user_id,)).fetchall()
+            elif scope == "handled":
+                rows = conn.execute("SELECT a.* FROM approvals a JOIN votes v ON v.approval_id=a.id WHERE v.user_id=%s AND (v.decision IS NOT NULL OR a.status<>'pending') ORDER BY a.created_at DESC LIMIT 100", (user_id,)).fetchall()
             else:
                 rows = conn.execute("SELECT a.* FROM approvals a JOIN votes v ON v.approval_id=a.id WHERE v.user_id=%s ORDER BY a.created_at DESC LIMIT 100", (user_id,)).fetchall()
-            return {"approvals": [self._format_approval(conn, row, base_url) for row in rows]}
+            pending_count = conn.execute("SELECT count(*) n FROM approvals a JOIN votes v ON v.approval_id=a.id WHERE v.user_id=%s AND v.decision IS NULL AND a.status='pending'", (user_id,)).fetchone()["n"]
+            return {"approvals": [self._format_approval(conn, row, base_url) for row in rows], "pendingCount": pending_count}
 
     def create_approval(self, user_id: str, payload: dict, base_url: str) -> dict:
         item_id = required_text(payload.get("itemId"), "商品", 80)

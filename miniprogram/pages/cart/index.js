@@ -13,6 +13,13 @@ Page({
   createItem() { wx.navigateTo({ url: '/miniprogram/pages/compose/index' }); },
   openItem(event) { wx.navigateTo({ url: `/miniprogram/pages/item-detail/index?id=${event.currentTarget.dataset.id}` }); },
   editItem(event) { wx.navigateTo({ url: `/miniprogram/pages/compose/index?id=${event.currentTarget.dataset.id}` }); },
+  askFriends(event) { wx.navigateTo({ url: `/miniprogram/pages/approval-create/index?itemId=${encodeURIComponent(event.currentTarget.dataset.id)}` }); },
+  moreActions(event) {
+    wx.showActionSheet({ itemList: ['编辑商品', '移出清单'], success: ({ tapIndex }) => {
+      if (tapIndex === 0) this.editItem(event);
+      if (tapIndex === 1) this.deleteItem(event);
+    } });
+  },
   deleteItem(event) {
     const id = event.currentTarget.dataset.id;
     if (this.data.deletingId) return;

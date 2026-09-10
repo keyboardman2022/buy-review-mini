@@ -1,5 +1,5 @@
 <view class="page form-page">
-  <view class="page-header"><view><view class="page-kicker">WISH DETAIL</view><view class="page-title">{{id ? '编辑商品' : '添加想买'}}</view><view class="page-subtitle">把用途和犹豫写清楚，朋友才好判断</view></view></view>
+  <view class="page-header"><view><view class="page-title">{{id ? '编辑商品' : '添加想买'}}</view><view class="page-subtitle">把用途和犹豫写清楚，朋友才好判断</view></view></view>
   <view wx:if="{{loading}}" class="loading">正在读取商品…</view><view wx:if="{{error}}" class="error">{{error}}</view>
   <view class="form-card">
     <view class="field"><text class="label">商品名称 <text class="required">必填</text></text><input class="input" maxlength="60" placeholder="例如：降噪耳机" value="{{title}}" data-field="title" bindinput="inputField"/></view>

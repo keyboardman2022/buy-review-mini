@@ -2,7 +2,10 @@ const { request } = require('../../utils/api');
 const { money } = require('../../utils/format');
 Page({
   data: { items: [], friends: [], itemId: '', selectedIds: [], rule: 'veto', loading: true, submitting: false, error: '' },
-  onLoad(options) { this.setData({ itemId: options.itemId || '' }); if (getApp().ensureSession()) this.load(); },
+  onLoad(options) { this.setData({ itemId: options.itemId || '' }); },
+  onShow() { if (getApp().ensureSession()) this.load(); },
+  addItem() { wx.navigateTo({ url: '/miniprogram/pages/compose/index' }); },
+  inviteFriends() { wx.navigateTo({ url: '/miniprogram/pages/friends/index' }); },
   async load() { this.setData({ loading: true, error: '' }); try { const [itemsData, friendsData] = await Promise.all([request('/api/items?scope=mine'), request('/api/friends')]); this.setData({ items: itemsData.items.map((item) => ({ ...item, priceText: money(item.price) })), friends: friendsData.friends.map((friend) => ({ ...friend, selected: this.data.selectedIds.includes(friend.id) })) }); } catch (error) { this.setData({ error: error.message }); } finally { this.setData({ loading: false }); } },
   chooseItem(event) { this.setData({ itemId: event.currentTarget.dataset.id, error: '' }); },
   chooseRule(event) { this.setData({ rule: event.currentTarget.dataset.rule }); },

@@ -61,3 +61,21 @@ def test_vote_at_expired_deadline_persists_expiration(client):
     detail = client.get(f"/api/approvals/{approval_id}", headers=owner).json()["approval"]
     assert detail["status"] == "expired"
     assert detail["reviewers"][0]["decision"] is None
+
+
+def test_approval_scopes_separate_pending_votes_and_closed_requests(client):
+    owner, reviewer = login(client, "a"), login(client, "b")
+    approval_id = create_approval(client, owner, "demo-b")
+    pending = client.get("/api/approvals?scope=pending", headers=reviewer).json()
+    assert [a["id"] for a in pending["approvals"]] == [approval_id]
+    assert pending["pendingCount"] == 1
+    assert client.get("/api/approvals?scope=handled", headers=reviewer).json()["approvals"] == []
+    client.post(f"/api/approvals/{approval_id}/vote", headers=reviewer, json={"decision": "accept", "comment": "经常用，价格合理"})
+    pending = client.get("/api/approvals?scope=pending", headers=reviewer).json()
+    assert pending["approvals"] == [] and pending["pendingCount"] == 0
+    assert client.get("/api/approvals?scope=handled", headers=reviewer).json()["approvals"][0]["id"] == approval_id
+    another_id = create_approval(client, owner, "demo-b")
+    client.post(f"/api/approvals/{another_id}/cancel", headers=owner)
+    handled = client.get("/api/approvals?scope=handled", headers=reviewer).json()["approvals"]
+    assert {a["id"] for a in handled} == {approval_id, another_id}
+    assert client.get("/api/approvals?scope=pending", headers=reviewer).json()["pendingCount"] == 0

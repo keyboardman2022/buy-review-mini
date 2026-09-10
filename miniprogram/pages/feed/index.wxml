@@ -1,11 +1,11 @@
 <view class="page">
-  <view class="page-header"><view><view class="page-kicker">FRIENDS' PICKS</view><view class="page-title">购物圈</view><view class="page-subtitle">朋友最近想买什么</view></view></view>
+  <view class="page-header"><view><view class="page-title">购物圈</view><view class="page-subtitle">朋友最近想买什么</view></view></view>
   <view wx:if="{{error}}" class="error">{{error}}<text class="retry" bindtap="load">重新加载</text></view>
   <view wx:if="{{loading}}" class="loading">正在加载好友动态…</view>
-  <view wx:elif="{{!items.length}}" class="empty"><text class="empty-mark">还没有动态</text><view>添加好友后，他们公开的购物愿望会出现在这里。</view></view>
+  <view wx:elif="{{!items.length}}" class="empty"><image class="empty-art" src="/miniprogram/assets/empty-wallet.png"/><text class="empty-mark">朋友的愿望，还没到站</text><view>添加好友后，他们公开的购物愿望会出现在这里。</view><button class="btn-accent btn-wide" bindtap="inviteFriends">邀请第一位朋友</button></view>
   <view wx:for="{{items}}" wx:key="id" class="feed-card">
     <view class="author row"><view class="avatar" style="background:{{item.owner.color}}">{{item.owner.initial}}</view><view class="grow"><view class="title">{{item.owner.name}}</view><view class="muted small">{{item.timeText}}</view></view><text class="tag">{{item.category || '想买'}}</text></view>
-    <view class="product" data-id="{{item.id}}" bindtap="openItem"><view class="row between product-head"><view class="product-title grow">{{item.title}}</view><view class="price">{{item.priceText}}</view></view><view class="meta">{{item.reason}}</view><view wx:if="{{item.photos.length}}" class="media-grid"><image wx:for="{{item.photos}}" wx:for-item="photo" wx:key="*this" class="media" src="{{photo}}" mode="aspectFill"/></view></view>
+    <view class="product" data-id="{{item.id}}" bindtap="openItem"><view class="row between product-head"><view class="product-title grow">{{item.title}}</view><view class="price">{{item.priceText}}</view></view><view class="meta">{{item.reason}}</view><view wx:if="{{item.photos.length}}" class="photo-layout photos-{{item.photos.length}}"><image wx:for="{{item.photos}}" wx:for-item="photo" wx:key="*this" src="{{photo}}" mode="aspectFill" data-id="{{item.id}}" data-index="{{index}}" catchtap="previewPhotos"/></view></view>
     <view class="feed-actions"><button class="action {{item.myReaction === 1 ? 'active' : ''}}" data-id="{{item.id}}" data-value="1" disabled="{{item.reacting}}" bindtap="react">值得买 <text>{{item.likes}}</text></button><button class="action {{item.myReaction === -1 ? 'down' : ''}}" data-id="{{item.id}}" data-value="-1" disabled="{{item.reacting}}" bindtap="react">先别买 <text>{{item.dislikes}}</text></button><button class="action" data-id="{{item.id}}" bindtap="openItem">评论 <text>{{item.commentCount}}</text></button></view>
   </view>
 </view>

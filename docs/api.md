@@ -28,7 +28,7 @@ User={id,name,initial,code,phoneMasked,hasPhone,color}。token存在wx本地存�
 Item={id,ownerId,owner:User,title,price,reason,category,link,visibility,images:string[],imageUrls:string[],createdAt,updatedAt,likes,dislikes,myReaction,commentCount}; images为媒体ID，imageUrls为临时可读绝对URL。Comment={id,itemId,text,createdAt,user:User}。
 
 - POST /api/media {base64,mime:'image/png'|'image/jpeg'|'image/webp'} -> {id,url}，单图3MB，最多3张，wx文件系统readFile base64后wx.request发送JSON；签名URL由后端产生，不能接受任意外部URL当图片。
-- GET /api/approvals?scope=sent|inbox -> {approvals:Approval[]}
+- GET /api/approvals?scope=sent|inbox|pending|handled -> {approvals:Approval[],pendingCount:number}
 - POST /api/approvals {itemId,reviewerIds:string[],rule:'veto'|'majority'|'unanimous'} -> {approval:Approval}
 - GET /api/approvals/:id -> {approval:Approval}
 - POST /api/approvals/:id/vote {decision:'accept'|'reject',comment} -> {approval:Approval}

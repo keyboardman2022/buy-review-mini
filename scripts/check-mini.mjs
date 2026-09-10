@@ -12,6 +12,11 @@ function readJson(filename) {
 const app = readJson(path.join(root, 'app.json'));
 const project = readJson(path.join(root, 'project.config.json'));
 readJson(path.join(root, 'sitemap.json'));
+for (const tab of app.tabBar?.list || []) {
+  for (const key of ['iconPath', 'selectedIconPath']) {
+    if (!tab[key] || !fs.existsSync(path.join(root, tab[key]))) errors.push(`missing tab icon ${tab[key] || key}`);
+  }
+}
 if (project.miniprogramRoot) errors.push('project.config.json: miniprogramRoot must be omitted because app.json is at project root');
 for (const page of app.pages || []) {
   const base = path.join(root, page);

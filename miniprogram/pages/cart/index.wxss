@@ -1,1 +1,7 @@
 .round-add { min-width: 112rpx; min-height: 72rpx; padding: 0 24rpx; border-radius: 36rpx; color: #fff; background: #17181a; line-height: 72rpx; }.wish-card { margin-bottom: 20rpx; padding: 26rpx 26rpx 8rpx; border-radius: 26rpx; background: #fff; border: 1rpx solid #eceef1; }.wish-main { display: flex; gap: 22rpx; margin-top: 24rpx; }.wish-title { font-size: 36rpx; font-weight: 800; }.wish-price { margin-top: 20rpx; }.clamp { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }.cover { flex-shrink: 0; width: 176rpx; height: 176rpx; border-radius: 20rpx; background: #eef0f2; }.wish-actions { display: grid; grid-template-columns: repeat(3,1fr); margin-top: 20rpx; border-top: 1rpx solid #eff0f2; }.wish-actions button { min-height: 80rpx; padding: 0; color: #676b72; background: transparent; font-size: 25rpx; line-height: 80rpx; }.wish-actions .danger { color: #c94730; }
+
+
+.wish-actions { grid-template-columns:1.4fr 1fr .7fr; align-items:center; padding:14rpx 0; gap:8rpx; }
+.wish-actions .ask-button { min-height:72rpx; line-height:72rpx; background:#fff0e5; color:#b34c24; border-radius:16rpx; }
+.cover-placeholder { display:flex; flex-direction:column; align-items:center; justify-content:center; background:#f6eedf; color:#9b784c; }
+.cover-placeholder text { font-size:46rpx; }.cover-placeholder label { margin-top:8rpx; font-size:22rpx; }

@@ -1,18 +1,22 @@
-const { request } = require('../../utils/api');
-const { money, dateTime } = require('../../utils/format');
-const statusText = { pending: '待审批', approved: '已通过', rejected: '已拒绝', expired: '已过期', cancelled: '已撤回' };
-const ruleText = { veto: '一票否决', majority: '多数决定', unanimous: '全员一致' };
+const { request, absoluteMediaUrl } = require('../../utils/api');
+const { decorateApproval } = require('../../utils/approval');
 Page({
-  data: { scope: 'inbox', approvals: [], loading: true, error: '' },
+  data: { scope: 'pending', approvals: [], pendingCount: 0, loading: true, error: '' },
   onShow() { if (getApp().ensureSession()) this.load(); },
-  onPullDownRefresh() { this.load().finally(() => wx.stopPullDownRefresh()); },
+  onPullDownRefresh() { return this.load().finally(() => wx.stopPullDownRefresh()); },
   switchScope(event) { const scope = event.currentTarget.dataset.scope; if (scope !== this.data.scope) { this.setData({ scope }); this.load(); } },
   async load() {
-    this.setData({ loading: true, error: '' });
-    try { const { approvals } = await request(`/api/approvals?scope=${this.data.scope}`); this.setData({ approvals: approvals.map((approval) => ({ ...approval, priceText: money(approval.price), createdText: dateTime(approval.createdAt), statusText: statusText[approval.status] || approval.status, ruleText: ruleText[approval.rule] || approval.rule, decidedCount: approval.reviewers.filter((reviewer) => reviewer.decision).length })) }); }
-    catch (error) { this.setData({ error: error.message }); }
-    finally { this.setData({ loading: false }); }
+    const version = this.loadVersion = (this.loadVersion || 0) + 1;
+    this.setData({ loading: true, error: '', approvals: [] });
+    try {
+      const data = await request(`/api/approvals?scope=${this.data.scope}`);
+      if (version !== this.loadVersion) return;
+      this.setData({ approvals: data.approvals.map((entry) => decorateApproval(entry, absoluteMediaUrl)), pendingCount: data.pendingCount || 0 });
+      if (this.data.pendingCount) wx.setTabBarBadge({ index: 2, text: this.data.pendingCount > 99 ? '99+' : String(this.data.pendingCount) });
+      else wx.removeTabBarBadge({ index: 2 });
+    } catch (error) { if (version === this.loadVersion) this.setData({ error: error.message }); }
+    finally { if (version === this.loadVersion) this.setData({ loading: false }); }
   },
-  openApproval(event) { wx.navigateTo({ url: `/miniprogram/pages/approval-detail/index?id=${event.currentTarget.dataset.id}` }); },
+  openApproval(event) { wx.navigateTo({ url: `/miniprogram/pages/approval-detail/index?id=${encodeURIComponent(event.currentTarget.dataset.id)}` }); },
   createApproval() { wx.navigateTo({ url: '/miniprogram/pages/approval-create/index' }); },
 });

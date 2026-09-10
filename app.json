@@ -21,15 +21,35 @@
     "enablePullDownRefresh": false
   },
   "tabBar": {
-    "color": "#6f756f",
-    "selectedColor": "#ff6436",
+    "color": "#777d73",
+    "selectedColor": "#e9683b",
     "backgroundColor": "#ffffff",
     "borderStyle": "white",
     "list": [
-      { "pagePath": "miniprogram/pages/feed/index", "text": "购物圈" },
-      { "pagePath": "miniprogram/pages/cart/index", "text": "想买" },
-      { "pagePath": "miniprogram/pages/approvals/index", "text": "审批" },
-      { "pagePath": "miniprogram/pages/profile/index", "text": "我的" }
+      {
+        "pagePath": "miniprogram/pages/feed/index",
+        "text": "购物圈",
+        "iconPath": "miniprogram/assets/tab-feed.png",
+        "selectedIconPath": "miniprogram/assets/tab-feed-active.png"
+      },
+      {
+        "pagePath": "miniprogram/pages/cart/index",
+        "text": "想买",
+        "iconPath": "miniprogram/assets/tab-wish.png",
+        "selectedIconPath": "miniprogram/assets/tab-wish-active.png"
+      },
+      {
+        "pagePath": "miniprogram/pages/approvals/index",
+        "text": "审批",
+        "iconPath": "miniprogram/assets/tab-approval.png",
+        "selectedIconPath": "miniprogram/assets/tab-approval-active.png"
+      },
+      {
+        "pagePath": "miniprogram/pages/profile/index",
+        "text": "我的",
+        "iconPath": "miniprogram/assets/tab-profile.png",
+        "selectedIconPath": "miniprogram/assets/tab-profile-active.png"
+      }
     ]
   },
   "style": "v2",

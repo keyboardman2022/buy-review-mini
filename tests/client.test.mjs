@@ -27,7 +27,9 @@ function loadScript(relativePath, extras = {}) {
 function loadPage(relativePath, { api = {}, wx = {}, app = { ensureSession: async () => true, globalData: {}, openLaunchTarget() {} } } = {}) {
   let definition;
   const { sandbox } = loadScript(relativePath, {
-    modules: { '../../utils/api': api, '../../utils/format': api },
+    modules: { '../../utils/api': api, '../../utils/format': api,
+      '../../utils/approval': loadScript('miniprogram/utils/approval.js', { modules: { './format': loadScript('miniprogram/utils/format.js').exports } }).exports,
+      '../../utils/share-card': { createShareCard: async () => '' } },
     globals: {
       Page(value) { definition = value; },
       getApp() { return app; },
@@ -157,7 +159,7 @@ test('approval share card opens the approval detail page directly', () => {
   const { page } = loadPage('miniprogram/pages/approval-detail/index.js');
   page.data = { id: 'approval / 1', approval: { title: '降噪耳机' } };
   const share = page.onShareAppMessage();
-  assert.equal(share.title, '请帮我看看：降噪耳机');
+  assert.equal(share.title, '帮我拿个主意：降噪耳机');
   assert.equal(share.path, '/miniprogram/pages/approval-detail/index?id=approval%20%2F%201');
 });
 
@@ -193,4 +195,78 @@ test('approval deep link restores the current user before enabling voting', asyn
   await page.load();
   assert.equal(app.globalData.user.id, 'reviewer-1');
   assert.equal(page.data.canVote, true);
+});
+
+test('approval progress explains each rule without claiming premature approval', () => {
+  const { exports: { decorateApproval } } = loadScript('miniprogram/utils/approval.js', { modules: { './format': loadScript('miniprogram/utils/format.js').exports } });
+  const base = { status: 'pending', expiresAt: 7200000, reviewers: [{ decision: 'accept' }, { decision: 'reject' }, { decision: null }] };
+  assert.equal(decorateApproval({ ...base, rule: 'majority' }, undefined, 0).progressText, '还需要 1 票支持');
+  assert.equal(decorateApproval({ ...base, rule: 'unanimous' }, undefined, 0).progressText, '还等 1 位朋友，全部回复后判定');
+  assert.equal(decorateApproval({ ...base, rule: 'veto', reviewers: [{ decision: 'accept' }, { decision: null }] }, undefined, 0).progressText, '还等 1 位朋友，任意一票反对即结束');
+  assert.equal(decorateApproval({ ...base, status: 'expired' }, undefined, 0).deadlineText, '本次已结束');
+});
+
+test('switching approval tabs ignores an older response and updates the pending badge', async () => {
+  const responses = [];
+  const badges = [];
+  const { page } = loadPage('miniprogram/pages/approvals/index.js', {
+    api: { request: () => new Promise((resolve) => responses.push(resolve)) },
+    wx: { setTabBarBadge: (value) => badges.push(value.text), removeTabBarBadge() {} },
+  });
+  const first = page.load();
+  page.data.scope = 'handled';
+  const second = page.load();
+  responses[1]({ approvals: [{ id: 'handled-1', status: 'approved', reviewers: [] }], pendingCount: 3 });
+  await second;
+  responses[0]({ approvals: [{ id: 'pending-1', status: 'pending', reviewers: [] }], pendingCount: 4 });
+  await first;
+  assert.equal(page.data.approvals[0].id, 'handled-1');
+  assert.deepEqual(badges, ['3']);
+});
+
+test('reaction toggles update only the item and preserve draft comments', async () => {
+  const calls = [];
+  const { page } = loadPage('miniprogram/pages/item-detail/index.js', { api: { request: async (path, options) => { calls.push({ path, options }); return { ok: true }; } } });
+  page.data = { id: 'item-1', item: { myReaction: 1, likes: 4, dislikes: 2 }, comment: '写了一半的评论', reacting: false };
+  await page.react({ currentTarget: { dataset: { value: -1 } } });
+  assert.equal(page.data.item.likes, 3);
+  assert.equal(page.data.item.dislikes, 3);
+  assert.equal(page.data.comment, '写了一半的评论');
+  await page.react({ currentTarget: { dataset: { value: -1 } } });
+  assert.equal(page.data.item.dislikes, 2);
+  assert.equal(page.data.item.myReaction, 0);
+  assert.equal(calls.length, 2);
+  assert.ok(calls.every((entry) => entry.options.method === 'POST'));
+});
+
+test('image preview opens the selected photo in the complete gallery', () => {
+  let preview;
+  const { page } = loadPage('miniprogram/pages/approval-detail/index.js', { wx: { previewImage: (value) => { preview = value; } } });
+  page.data.approval = { photos: ['https://example.test/1.png', 'https://example.test/2.png'] };
+  page.previewPhotos({ currentTarget: { dataset: { index: 1 } } });
+  assert.equal(preview.current, 'https://example.test/2.png');
+  assert.equal(preview.urls.length, 2);
+});
+
+test('share card still exports a branded image when the product photo fails', async () => {
+  const labels = [];
+  const context = new Proxy({}, { get(_, key) {
+    if (key === 'measureText') return (text) => ({ width: Array.from(text).length * 22 });
+    if (key === 'fillText') return (text) => labels.push(text);
+    if (key === 'draw') return (_, callback) => callback();
+    return () => {};
+  } });
+  const { exports } = loadScript('miniprogram/utils/share-card.js', { globals: { wx: {
+    getImageInfo({ fail }) { fail(); },
+    createCanvasContext() { return context; },
+    canvasToTempFilePath({ success }) { success({ tempFilePath: '/tmp/share.png' }); },
+  } } });
+  const image = await exports.createShareCard({}, {
+    photos: ['https://example.test/broken.png'], title: '一个特别长的商品标题需要正确截断避免与价格重叠', priceText: '¥899.00', ruleText: '多数决定',
+    reviewers: [{ comment: '这条私密意见不该出现在封面' }],
+  });
+  assert.equal(image, '/tmp/share.png');
+  assert.ok(labels.includes('¥899.00'));
+  assert.ok(labels.some((text) => text.endsWith('…')));
+  assert.ok(!labels.some((text) => text.includes('私密意见')));
 });

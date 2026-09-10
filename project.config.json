@@ -53,6 +53,10 @@
       {
         "value": "tests",
         "type": "folder"
+      },
+      {
+        "value": "artifacts",
+        "type": "folder"
       }
     ],
     "include": []

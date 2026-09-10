@@ -1,7 +1,23 @@
-<view class="page">
-  <view wx:if="{{loading}}" class="loading">正在读取审批…</view><view wx:if="{{error}}" class="error">{{error}}</view>
-  <block wx:if="{{approval}}"><view class="result-card {{approval.status}}"><view class="row between"><text class="result-label">{{approval.statusText}}</text><text class="result-rule">{{approval.ruleText}}</text></view><view class="result-title">{{approval.title}}</view><view class="result-price">{{approval.priceText}}</view><view class="result-reason">{{approval.reason}}</view><view class="media-grid"><image wx:for="{{approval.photos}}" wx:key="*this" class="media" src="{{item}}" mode="aspectFill"/></view><view class="result-meta"><view><text>发起人</text><view class="result-meta-value">{{approval.owner.name}}</view></view><view><text>截止</text><view class="result-meta-value">{{approval.expiresText}}</view></view></view></view>
-  <view class="section-title"><text>审批进度</text><text class="section-subtitle">{{approval.reviewers.length}} 位朋友</text></view><view class="review-list"><view wx:for="{{approval.reviewers}}" wx:key="id" class="review-item"><view class="row"><view class="avatar mini" style="background:{{item.user.color}}">{{item.user.initial}}</view><view class="grow"><view class="title">{{item.user.name}}</view><view class="muted small">{{item.votedText || '等待回复'}}</view></view><text class="status {{item.decision || 'pending'}}">{{item.decisionText}}</text></view><view wx:if="{{item.comment}}" class="review-comment">{{item.comment}}</view></view></view>
-  <view wx:if="{{canVote}}" class="vote-card"><view class="vote-title">你的决定</view><view class="vote-sub">请留下具体理由，发起人会看到。</view><textarea class="textarea" maxlength="300" placeholder="说说为什么可以买，或为什么应该等等" value="{{comment}}" bindinput="inputComment"/><view class="vote-actions"><button class="btn-success" data-decision="accept" loading="{{submitting}}" disabled="{{submitting}}" bindtap="submitVote">支持购买</button><button class="btn-danger" data-decision="reject" disabled="{{submitting}}" bindtap="submitVote">建议别买</button></view></view>
-  <view class="owner-row {{!(isOwner && approval.status === 'pending') ? 'share-only' : ''}}"><button wx:if="{{isOwner && approval.status === 'pending'}}" class="btn-danger" disabled="{{submitting}}" bindtap="cancel">撤回审批</button><button class="btn-soft" open-type="share">分享给审批好友</button></view></block>
+<view class="page receipt-page">
+  <view wx:if="{{loading}}" class="loading">正在读取朋友的意见…</view><view wx:if="{{error}}" class="error">{{error}}<button class="btn-soft" bindtap="load">重新加载</button></view>
+  <block wx:if="{{approval}}">
+    <view class="receipt">
+      <view class="row between"><text class="receipt-brand">买前问问 · 决定小票</text><text class="receipt-number">{{approval.ruleText}}</text></view>
+      <view class="receipt-heading"><view class="grow"><view class="result-title">{{approval.title}}</view><view class="result-price">{{approval.priceText}}</view></view><view class="receipt-stamp {{approval.status}}">{{approval.statusText}}</view></view>
+      <view class="result-reason">{{approval.reason}}</view>
+      <view wx:if="{{approval.photos.length}}" class="photo-layout photos-{{approval.photos.length}}"><image wx:for="{{approval.photos}}" wx:key="*this" src="{{item}}" mode="aspectFill" data-index="{{index}}" bindtap="previewPhotos"/></view>
+      <view class="receipt-tear"></view>
+      <view class="receipt-line"><text>发起人</text><text>{{approval.owner.name}}</text></view><view class="receipt-line"><text>截止时间</text><text>{{approval.expiresText}}</text></view>
+      <view class="vote-meter"><view class="meter-yes" style="width:{{approval.yesWidth}}%"></view><view class="meter-no" style="width:{{approval.noWidth}}%"></view></view>
+      <view class="vote-counts"><text>支持 {{approval.yes}}</text><text>建议等等 {{approval.no}}</text><text>未回复 {{approval.waiting}}</text></view>
+      <view class="receipt-summary">{{approval.progressText}}</view>
+      <button class="btn-accent btn-wide" open-type="share">分享给审批好友</button>
+    </view>
+    <view wx:if="{{canVote}}" id="vote-form" class="vote-card"><view class="vote-title">轮到你拿主意了</view><view class="vote-sub">说说理由，比一个赞更有帮助。</view><textarea class="textarea" maxlength="300" placeholder="准备怎么用？价格合适吗？有没有替代品？" value="{{comment}}" bindinput="inputComment"/><view class="vote-actions"><button class="btn-success" data-decision="accept" loading="{{submitting}}" disabled="{{submitting}}" bindtap="submitVote">支持购买</button><button class="btn-danger" data-decision="reject" disabled="{{submitting}}" bindtap="submitVote">建议等等</button></view></view>
+    <view class="section-title"><text>朋友的回音</text><text class="section-subtitle">{{approval.decidedCount}}/{{approval.reviewers.length}} 已回复</text></view>
+    <view class="review-list"><view wx:for="{{approval.reviewers}}" wx:key="id" class="review-item"><view class="row"><view class="avatar mini" style="background:{{item.user.color}}">{{item.user.initial}}</view><view class="grow"><view class="title">{{item.user.name}}</view><view class="muted small">{{item.votedText || '还在等朋友的意见'}}</view></view><text class="status {{item.decision || 'pending'}}">{{item.decisionText}}</text></view><view wx:if="{{item.comment}}" class="review-comment">{{item.comment}}</view></view></view>
+    <button wx:if="{{isOwner && approval.status === 'pending'}}" class="withdraw" disabled="{{submitting}}" bindtap="cancel">撤回这次审批</button>
+    <view wx:if="{{canVote}}" class="vote-dock"><text>你的意见还没提交</text><button class="btn-accent" bindtap="focusVote">去写意见</button></view>
+  </block>
+  <canvas canvas-id="share-card" class="share-canvas" style="width:500px;height:400px"/>
 </view>
